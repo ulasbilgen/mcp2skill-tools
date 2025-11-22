@@ -131,6 +131,25 @@ describe('Integration Tests', () => {
         'utf-8'
       );
 
+      // Verify package.json was written
+      expect(mockedFs.writeFile).toHaveBeenCalledWith(
+        path.join(tmpDir, 'mcp-chrome-devtools', 'scripts', 'package.json'),
+        expect.stringContaining('"type": "module"'),
+        'utf-8'
+      );
+
+      // Verify package.json contains required dependencies
+      const packageJsonCall = (mockedFs.writeFile as any).mock.calls.find((call: any[]) =>
+        call[0].toString().endsWith('package.json')
+      );
+      expect(packageJsonCall).toBeDefined();
+      const packageJsonContent = packageJsonCall![1] as string;
+      const packageJson = JSON.parse(packageJsonContent);
+      expect(packageJson.dependencies).toHaveProperty('axios');
+      expect(packageJson.dependencies).toHaveProperty('commander');
+      expect(packageJson.type).toBe('module');
+      expect(packageJson.name).toBe('mcp-chrome-devtools-skill');
+
       // Verify tool scripts were written
       expect(mockedFs.writeFile).toHaveBeenCalledWith(
         path.join(tmpDir, 'mcp-chrome-devtools', 'scripts', 'navigate.js'),

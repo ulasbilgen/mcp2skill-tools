@@ -48,6 +48,7 @@ description: ${description}
 ${intro}
 
 ## Prerequisites
+- Node.js 18+ installed
 - mcp2rest running on ${mcp2restUrl}
 - ${serverName} server loaded in mcp2rest
 - Package: \`${pkg}\`
@@ -57,6 +58,9 @@ ${intro}
 \`\`\`bash
 # Navigate to the skill scripts directory
 cd scripts/
+
+# Install dependencies (first time only)
+npm install
 
 # Example: List available options
 node ${tools[0]?.name || 'tool'}.js --help
@@ -252,6 +256,33 @@ node scripts/tool_name.js --help
 # Run a tool
 node scripts/tool_name.js --arg value
 \`\`\``;
+}
+
+/**
+ * Generate package.json for the skill scripts directory.
+ *
+ * Creates a package.json that defines the skill as an ES module project
+ * with required dependencies for the generated scripts.
+ *
+ * @param serverName - Name of the MCP server
+ * @returns package.json content as string
+ */
+export function createPackageJson(serverName: string): string {
+  const packageObj = {
+    name: `mcp-${serverName}-skill`,
+    version: '1.0.0',
+    description: `Claude Code skill scripts for ${serverName} MCP server`,
+    type: 'module',
+    dependencies: {
+      axios: '^1.6.2',
+      commander: '^11.1.0',
+    },
+    keywords: ['mcp', 'claude-code', 'skill', serverName],
+    author: '',
+    license: 'MIT',
+  };
+
+  return JSON.stringify(packageObj, null, 2) + '\n';
 }
 
 /**

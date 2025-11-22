@@ -8,7 +8,7 @@ import * as fs from 'fs/promises';
 import { homedir } from 'os';
 import type { ServerInfo, Tool, GenerateSkillResult } from './types.js';
 import { MCPConnectionError } from './exceptions.js';
-import { createSkillMd, createMcpClientScript, createToolScript } from './templates.js';
+import { createSkillMd, createMcpClientScript, createToolScript, createPackageJson } from './templates.js';
 
 export class ScriptGenerator {
   private baseUrl: string;
@@ -142,6 +142,10 @@ export class ScriptGenerator {
     // Create scripts directory
     const scriptsDir = path.join(skillDir, 'scripts');
     await fs.mkdir(scriptsDir, { recursive: true });
+
+    // Generate package.json for dependencies
+    const packageJson = createPackageJson(serverName);
+    await fs.writeFile(path.join(scriptsDir, 'package.json'), packageJson, 'utf-8');
 
     // Generate shared mcp_client.js utility
     const mcpClientCode = createMcpClientScript(this.baseUrl);
