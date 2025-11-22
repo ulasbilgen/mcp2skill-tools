@@ -1,0 +1,26 @@
+{
+  "name": "mcp2skill-tools",
+  "version": "1.0.0",
+  "description": "Monorepo for mcp2rest, mcp2scripts, and mcp2skill-commands",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces",
+    "build": "npm run build --workspaces",
+    "clean": "npm run clean --workspaces"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude-code",
+    "skills"
+  ],
+  "author": "Ulas Bilgenoglu",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

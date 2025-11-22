@@ -1,0 +1,720 @@
+openapi: 3.0.3
+info:
+  title: mcp2rest API
+  version: 0.4.0
+  description: |
+    REST API for managing and interacting with MCP (Model Context Protocol) servers.
+
+    mcp2rest is a standalone Node.js daemon that manages multiple MCP servers and exposes
+    their tools via a universal HTTP interface, allowing developers using any programming
+    language to leverage MCP tools without Node.js integration complexity.
+
+    ## Features
+    - Execute tools on MCP servers via REST API
+    - Manage multiple servers simultaneously (stdio and HTTP transports)
+    - Dynamic server addition and removal
+    - Query available tools and server status
+  contact:
+    name: mcp2rest
+    url: https://github.com/ulasbilgen/mcp2rest
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:28888
+    description: Local development server (default)
+
+tags:
+  - name: Tool Execution
+    description: Execute tools on MCP servers
+  - name: Server Management
+    description: Manage MCP server instances
+  - name: Health
+    description: Gateway health and status
+
+paths:
+  /call:
+    post:
+      tags:
+        - Tool Execution
+      summary: Execute a tool on an MCP server
+      description: |
+        Executes a specified tool on a configured MCP server with the provided arguments.
+        The request will timeout after 30 seconds by default.
+      operationId: callTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallRequest'
+            examples:
+              chromeNavigate:
+                summary: Chrome DevTools - Navigate
+                value:
+                  server: chrome-devtools
+                  tool: navigate
+                  arguments:
+                    url: https://example.com
+              figmaDesignContext:
+                summary: Figma Desktop - Get Design Context
+                value:
+                  server: figma-desktop
+                  tool: get_design_context
+                  arguments: {}
+      responses:
+        '200':
+          description: Tool executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallSuccessResponse'
+              examples:
+                success:
+                  summary: Successful tool execution
+                  value:
+                    success: true
+                    result:
+                      content:
+                        - type: text
+                          text: "Tool executed successfully"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingFields:
+                  summary: Missing required fields
+                  value:
+                    error:
+                      code: INVALID_ARGUMENTS
+                      message: "Missing required fields: server and tool"
+        '404':
+          description: Server or tool not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                serverNotFound:
+                  summary: Server not found
+                  value:
+                    error:
+                      code: SERVER_NOT_FOUND
+                      message: "Server 'unknown-server' not found"
+                toolNotFound:
+                  summary: Tool not found
+                  value:
+                    error:
+                      code: TOOL_NOT_FOUND
+                      message: "Tool 'unknown-tool' not found on server 'chrome-devtools'"
+        '500':
+          description: Tool execution failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                executionError:
+                  summary: Tool execution error
+                  value:
+                    error:
+                      code: TOOL_EXECUTION_ERROR
+                      message: "Failed to execute tool: Internal error"
+        '503':
+          description: Server is disconnected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                disconnected:
+                  summary: Server disconnected
+                  value:
+                    error:
+                      code: SERVER_DISCONNECTED
+                      message: "Server 'chrome-devtools' is not connected"
+        '504':
+          description: Tool execution timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                timeout:
+                  summary: Execution timeout
+                  value:
+                    error:
+                      code: TOOL_TIMEOUT
+                      message: "Tool execution exceeded 30 seconds"
+
+  /servers:
+    get:
+      tags:
+        - Server Management
+      summary: List all MCP servers
+      description: Returns a list of all configured MCP servers with their current status
+      operationId: listServers
+      responses:
+        '200':
+          description: List of servers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServerInfo'
+              examples:
+                multipleServers:
+                  summary: Multiple servers (stdio and HTTP)
+                  value:
+                    - name: chrome-devtools
+                      transport: stdio
+                      package: chrome-devtools-mcp@latest
+                      status: connected
+                      toolCount: 26
+                      lastConnected: "2025-11-08T23:13:21.738Z"
+                    - name: figma-desktop
+                      transport: http
+                      url: http://127.0.0.1:3845/mcp
+                      status: connected
+                      toolCount: 7
+                      lastConnected: "2025-11-08T23:14:07.173Z"
+                empty:
+                  summary: No servers configured
+                  value: []
+        '500':
+          description: Failed to retrieve server information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Server Management
+      summary: Add a new MCP server
+      description: |
+        Dynamically adds a new MCP server to the gateway. The server will be started
+        immediately and persisted to the configuration file.
+
+        You must provide either `package` (for stdio transport) or `url` (for HTTP transport).
+        The transport type will be auto-detected if not explicitly specified.
+      operationId: addServer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddServerRequest'
+            examples:
+              stdioServer:
+                summary: Add stdio server (Chrome DevTools)
+                value:
+                  name: chrome-devtools
+                  package: chrome-devtools-mcp@latest
+              stdioWithArgs:
+                summary: Add stdio server with arguments
+                value:
+                  name: filesystem
+                  package: "@modelcontextprotocol/server-filesystem"
+                  args:
+                    - /home/user/workspace
+              httpServer:
+                summary: Add HTTP server (Figma Desktop)
+                value:
+                  name: figma-desktop
+                  url: http://127.0.0.1:3845/mcp
+              explicitTransport:
+                summary: Explicit transport type
+                value:
+                  name: my-server
+                  url: http://example.com/mcp
+                  transport: http
+      responses:
+        '201':
+          description: Server added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    message: "Server 'chrome-devtools' added successfully"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingName:
+                  summary: Missing server name
+                  value:
+                    error:
+                      code: INVALID_ARGUMENTS
+                      message: "Missing required field: name"
+                missingPackageAndUrl:
+                  summary: Missing package or URL
+                  value:
+                    error:
+                      code: INVALID_ARGUMENTS
+                      message: "Must provide either \"package\" (for stdio) or \"url\" (for HTTP)"
+                invalidTransport:
+                  summary: Invalid transport type
+                  value:
+                    error:
+                      code: INVALID_TRANSPORT
+                      message: "Invalid transport type. Must be \"stdio\" or \"http\""
+                invalidUrl:
+                  summary: Invalid URL format
+                  value:
+                    error:
+                      code: INVALID_URL
+                      message: "Invalid URL format: Invalid URL"
+        '409':
+          description: Server already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflict:
+                  value:
+                    error:
+                      code: SERVER_ALREADY_EXISTS
+                      message: "Server 'chrome-devtools' already exists"
+        '500':
+          description: Failed to add server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                addFailed:
+                  value:
+                    error:
+                      code: SERVER_ADD_FAILED
+                      message: "Failed to connect to server"
+
+  /servers/{name}:
+    delete:
+      tags:
+        - Server Management
+      summary: Remove an MCP server
+      description: |
+        Removes a server from the gateway. The server will be disconnected and removed
+        from the configuration file.
+      operationId: removeServer
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the server to remove
+          schema:
+            type: string
+          example: chrome-devtools
+      responses:
+        '200':
+          description: Server removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  value:
+                    success: true
+                    message: "Server 'chrome-devtools' removed successfully"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingName:
+                  value:
+                    error:
+                      code: INVALID_ARGUMENTS
+                      message: "Server name is required"
+        '404':
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error:
+                      code: SERVER_NOT_FOUND
+                      message: "Server 'unknown-server' not found"
+        '500':
+          description: Failed to remove server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /servers/{name}/tools:
+    get:
+      tags:
+        - Server Management
+      summary: List tools available on a server
+      description: Returns all tools exposed by the specified MCP server
+      operationId: getServerTools
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the server
+          schema:
+            type: string
+          example: chrome-devtools
+      responses:
+        '200':
+          description: List of available tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tool'
+              examples:
+                chromeTools:
+                  summary: Chrome DevTools tools
+                  value:
+                    - name: navigate
+                      description: Navigate to a URL
+                      inputSchema:
+                        type: object
+                        properties:
+                          url:
+                            type: string
+                            description: The URL to navigate to
+                        required:
+                          - url
+                    - name: click
+                      description: Click an element on the page
+                      inputSchema:
+                        type: object
+                        properties:
+                          selector:
+                            type: string
+                            description: CSS selector for the element
+                        required:
+                          - selector
+        '404':
+          description: Server not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFound:
+                  value:
+                    error:
+                      code: SERVER_NOT_FOUND
+                      message: "Server 'unknown-server' not found"
+        '500':
+          description: Failed to retrieve tools
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns the health status of the gateway and server statistics
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Gateway is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  value:
+                    status: ok
+                    serverCount: 2
+                    connectedServers: 2
+        '500':
+          description: Health check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /openapi.yaml:
+    get:
+      tags:
+        - Health
+      summary: Get OpenAPI specification
+      description: Returns the OpenAPI/Swagger specification for this API in YAML format
+      operationId: getOpenAPISpec
+      responses:
+        '200':
+          description: OpenAPI specification
+          content:
+            application/x-yaml:
+              schema:
+                type: string
+                format: binary
+              example: |
+                openapi: 3.0.3
+                info:
+                  title: mcp2rest API
+                  version: 0.4.0
+                ...
+        '500':
+          description: Failed to read specification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                readError:
+                  value:
+                    error:
+                      code: GATEWAY_ERROR
+                      message: "Failed to read OpenAPI specification"
+
+components:
+  schemas:
+    CallRequest:
+      type: object
+      required:
+        - server
+        - tool
+      properties:
+        server:
+          type: string
+          description: Name of the MCP server to call
+          example: chrome-devtools
+        tool:
+          type: string
+          description: Name of the tool to execute
+          example: navigate
+        arguments:
+          type: object
+          description: Arguments to pass to the tool (optional)
+          additionalProperties: true
+          default: {}
+          example:
+            url: https://example.com
+
+    CallSuccessResponse:
+      type: object
+      required:
+        - success
+        - result
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        result:
+          type: object
+          required:
+            - content
+          properties:
+            content:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    description: Content type
+                  text:
+                    type: string
+                    description: Text content (optional)
+                  data:
+                    description: Data content (optional, any type)
+
+    AddServerRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Unique name for the server
+          example: chrome-devtools
+        package:
+          type: string
+          description: NPM package name (required for stdio transport)
+          example: chrome-devtools-mcp@latest
+        args:
+          type: array
+          description: Arguments to pass to the server command (stdio only)
+          items:
+            type: string
+          example:
+            - /home/user/workspace
+        url:
+          type: string
+          format: uri
+          description: Server URL (required for HTTP transport)
+          example: http://127.0.0.1:3845/mcp
+        transport:
+          type: string
+          enum:
+            - stdio
+            - http
+          description: Transport type (auto-detected if not specified)
+
+    ServerInfo:
+      type: object
+      required:
+        - name
+        - transport
+        - status
+        - toolCount
+      properties:
+        name:
+          type: string
+          description: Server name
+          example: chrome-devtools
+        transport:
+          type: string
+          enum:
+            - stdio
+            - http
+          description: Transport type
+        package:
+          type: string
+          description: NPM package name (only for stdio transport)
+          example: chrome-devtools-mcp@latest
+        url:
+          type: string
+          format: uri
+          description: Server URL (only for HTTP transport)
+          example: http://127.0.0.1:3845/mcp
+        status:
+          type: string
+          enum:
+            - connected
+            - disconnected
+            - error
+            - reconnecting
+          description: Current connection status
+        toolCount:
+          type: integer
+          description: Number of tools available on this server
+          example: 26
+        error:
+          type: string
+          description: Error message if status is 'error' (optional)
+        lastConnected:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of last successful connection (optional)
+          example: "2025-11-08T23:13:21.738Z"
+
+    Tool:
+      type: object
+      required:
+        - name
+        - inputSchema
+      properties:
+        name:
+          type: string
+          description: Tool name
+          example: navigate
+        description:
+          type: string
+          description: Tool description (optional)
+          example: Navigate to a URL
+        inputSchema:
+          type: object
+          description: JSON Schema describing the tool's input parameters
+          properties:
+            type:
+              type: string
+            properties:
+              type: object
+            required:
+              type: array
+              items:
+                type: string
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - serverCount
+        - connectedServers
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+          description: Overall health status
+        serverCount:
+          type: integer
+          description: Total number of configured servers
+          example: 2
+        connectedServers:
+          type: integer
+          description: Number of currently connected servers
+          example: 2
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        message:
+          type: string
+          example: "Server 'chrome-devtools' added successfully"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - SERVER_NOT_FOUND
+                - SERVER_DISCONNECTED
+                - SERVER_ADD_FAILED
+                - SERVER_ALREADY_EXISTS
+                - TOOL_NOT_FOUND
+                - TOOL_EXECUTION_ERROR
+                - TOOL_TIMEOUT
+                - INVALID_ARGUMENTS
+                - INVALID_CONFIG
+                - INVALID_URL
+                - INVALID_TRANSPORT
+                - GATEWAY_ERROR
+                - DAEMON_NOT_RUNNING
+              description: Error code
+            message:
+              type: string
+              description: Human-readable error message
+              example: "Server 'chrome-devtools' not found"
+
+  securitySchemes: {}
+
+security: []

@@ -1,0 +1,24 @@
+# MCP Gateway Configuration Example
+# This file will be created at ~/.mcp-gateway/config.yaml on first run
+
+# MCP Server configurations
+servers:
+  # Example: Chrome DevTools MCP Server
+  # chrome:
+  #   package: chrome-devtools-mcp@latest
+  #   args:
+  #     - --headless=true
+  #     - --isolated=true
+  
+  # Example: Filesystem MCP Server
+  # filesystem:
+  #   package: "@modelcontextprotocol/server-filesystem"
+  #   args:
+  #     - /home/user/workspace
+
+# Gateway settings
+gateway:
+  port: 3000
+  host: localhost
+  timeout: 30000
+  logLevel: info
