@@ -9,8 +9,9 @@
  * import { ScriptGenerator } from 'mcp2scripts';
  *
  * const gen = new ScriptGenerator('http://localhost:28888');
- * const skillDir = await gen.generateSkill('chrome-devtools');
- * console.log(`Skill generated at: ${skillDir}`);
+ * const result = await gen.generateSkill('chrome-devtools');
+ * console.log(`Skill generated at: ${result.skillPath}`);
+ * console.log(`Created ${result.toolCount} tool scripts`);
  * ```
  *
  * CLI Usage:
@@ -23,8 +24,11 @@
 
 export const VERSION = '0.1.0';
 
-// Export core generator (to be implemented)
+// Export core generator
 export { ScriptGenerator } from './generator.js';
 
-// Export exceptions (to be implemented)
+// Export exceptions
 export * from './exceptions.js';
+
+// Export types
+export type { ServerInfo, Tool, JsonSchema, GenerateSkillResult } from './types.js';
