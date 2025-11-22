@@ -22,7 +22,7 @@ Generate JavaScript scripts from MCP Server Tools for Claude Code Skills to use.
 - **Purpose**: Convert MCP tools into executable scripts
 - **Key features**: Auto-generates JavaScript wrappers, commander-based CLI, skill documentation
 - **Generated scripts**: JavaScript (Node.js)
-- **Status**: In development (converting from Python mcp2skill)
+- **Status**: Production ready (TypeScript rewrite of Python mcp2skill)
 
 ### 📦 [mcp2skill-commands](./packages/mcp2skill-commands/)
 
