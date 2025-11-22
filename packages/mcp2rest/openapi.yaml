@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: mcp2rest API
-  version: 0.4.0
+  version: 0.4.2
   description: |
     REST API for managing and interacting with MCP (Model Context Protocol) servers.
 
@@ -16,7 +16,7 @@ info:
     - Query available tools and server status
   contact:
     name: mcp2rest
-    url: https://github.com/ulasbilgen/mcp2rest
+    url: https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest
   license:
     name: MIT
 

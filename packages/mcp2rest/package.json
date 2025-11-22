@@ -1,6 +1,6 @@
 {
   "name": "mcp2rest",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "A standalone Node.js daemon that manages multiple MCP servers and exposes their tools via REST API",
   "main": "dist/index.js",
   "bin": {
@@ -28,12 +28,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ulasbilgen/mcp2rest.git"
+    "url": "https://github.com/ulasbilgen/mcp2skill-tools.git",
+    "directory": "packages/mcp2rest"
   },
   "bugs": {
-    "url": "https://github.com/ulasbilgen/mcp2rest/issues"
+    "url": "https://github.com/ulasbilgen/mcp2skill-tools/issues"
   },
-  "homepage": "https://github.com/ulasbilgen/mcp2rest#readme",
+  "homepage": "https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest#readme",
   "engines": {
     "node": ">=18.0.0"
   },
