@@ -1,0 +1,37 @@
+# Source files (we publish dist/ only)
+src/
+tsconfig.json
+vitest.config.ts
+
+# Tests
+tests/
+*.test.ts
+*.test.js
+coverage/
+
+# Development
+examples/
+.vscode/
+.idea/
+
+# Build artifacts
+*.tsbuildinfo
+node_modules/
+
+# Linting and formatting
+.eslintrc.json
+.prettierrc
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Misc
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
