@@ -37,11 +37,14 @@ npx mcp2scripts servers
 # 1. List available MCP servers
 mcp2scripts servers
 
-# 2. Generate skill for a specific server
+# 2. Generate skill for a specific server (creates in project folder ./.claude/skills)
 mcp2scripts generate chrome-devtools
 
-# 3. Skills are created in ~/.claude/skills/mcp-{server-name}/
-# 4. Claude Code automatically discovers skills in this directory
+# 3. Or generate in user folder with --user flag
+mcp2scripts generate chrome-devtools --user
+
+# 4. Skills are created in ./.claude/skills/mcp-{server-name}/ or ~/.claude/skills/mcp-{server-name}/
+# 5. Claude Code automatically discovers skills in both locations
 ```
 
 ## CLI Usage
@@ -79,8 +82,11 @@ Available servers in mcp2rest (http://localhost:28888):
 Generate a skill for a specific server:
 
 ```bash
-# Generate skill for chrome-devtools
+# Generate skill for chrome-devtools (default: project folder)
 mcp2scripts generate chrome-devtools
+
+# Generate to user folder
+mcp2scripts generate chrome-devtools --user
 
 # Generate to custom directory
 mcp2scripts generate chrome-devtools -o ./my-skills
@@ -96,16 +102,16 @@ mcp2scripts generate chrome-devtools --endpoint http://192.168.1.100:28888
 ```
 Generating skill for 'chrome-devtools'...
 mcp2rest: http://localhost:28888
-Output: ~/.claude/skills
+Output: ./.claude/skills
 
-✓ Generated skill: ~/.claude/skills/mcp-chrome-devtools
-  SKILL.md: ~/.claude/skills/mcp-chrome-devtools/SKILL.md
+✓ Generated skill: ./.claude/skills/mcp-chrome-devtools
+  SKILL.md: ./.claude/skills/mcp-chrome-devtools/SKILL.md
   Scripts: 15 tools + 1 shared client
 
 Next steps:
-  1. Claude Code will auto-discover skills in ~/.claude/skills/
-  2. Or manually navigate to skill directory
-  3. Run scripts: node scripts/tool_name.js --help
+  1. Navigate to skill directory and run: npm install
+  2. Run scripts: node scripts/tool_name.js --help
+  3. Claude Code will auto-discover skills from project .claude/skills/ or user ~/.claude/skills/
 ```
 
 ### List Tools
@@ -135,10 +141,24 @@ Tools for 'chrome-devtools' (15 total):
 
 ## Generated Skill Structure
 
+**Default (project folder):**
+```
+./.claude/skills/mcp-{server-name}/
+├── SKILL.md              # Skill documentation
+└── scripts/
+    ├── package.json      # Dependencies (axios, commander)
+    ├── mcp_client.js     # Shared REST client
+    ├── tool1.js          # Generated script for tool1
+    ├── tool2.js          # Generated script for tool2
+    └── ...
+```
+
+**With --user flag:**
 ```
 ~/.claude/skills/mcp-{server-name}/
 ├── SKILL.md              # Skill documentation
 └── scripts/
+    ├── package.json      # Dependencies (axios, commander)
     ├── mcp_client.js     # Shared REST client
     ├── tool1.js          # Generated script for tool1
     ├── tool2.js          # Generated script for tool2
@@ -208,12 +228,15 @@ console.log(servers);
 const tools = await gen.getTools('chrome-devtools');
 console.log(tools);
 
-// Generate skill
-const result = await gen.generateSkill('chrome-devtools', '~/.claude/skills');
+// Generate skill (default: ./.claude/skills)
+const result = await gen.generateSkill('chrome-devtools');
 console.log(`Generated ${result.toolCount} tools at ${result.skillPath}`);
 
+// Generate to user folder
+const resultUser = await gen.generateSkill('chrome-devtools', '~/.claude/skills');
+
 // Generate all skills
-const results = await gen.generateAllSkills('~/.claude/skills');
+const results = await gen.generateAllSkills();
 console.log(`Generated ${results.length} skills`);
 ```
 
@@ -263,7 +286,7 @@ Throws `Error` if server not found.
 Generate a Claude Code skill for an MCP server.
 
 - `serverName` - Name of the MCP server
-- `outputDir` - Output directory (default: `~/.claude/skills`)
+- `outputDir` - Output directory (default: `./.claude/skills`)
 
 Returns:
 ```typescript
@@ -309,18 +332,22 @@ mcp2scripts generate chrome-devtools --endpoint http://custom-host:8080
 
 ### With Claude Code
 
-Claude Code automatically discovers skills in `~/.claude/skills/`:
+Claude Code automatically discovers skills in both `./.claude/skills/` (project) and `~/.claude/skills/` (user):
 
-1. Generate skills: `mcp2scripts generate --all`
-2. Start Claude Code
-3. Skills are available immediately
+1. Generate skills: `mcp2scripts generate --all` (creates in project folder)
+2. Or generate in user folder: `mcp2scripts generate --all --user`
+3. Start Claude Code
+4. Skills are available immediately
 
 ### Manual Usage
 
 Run tool scripts directly:
 
 ```bash
-cd ~/.claude/skills/mcp-chrome-devtools/scripts
+cd ./.claude/skills/mcp-chrome-devtools/scripts
+
+# Install dependencies (first time only)
+npm install
 
 # Get help
 node navigate.js --help
@@ -413,7 +440,10 @@ node screenshot.js --full-page
 # Generate chrome-devtools skill
 mcp2scripts generate chrome-devtools
 
-cd ~/.claude/skills/mcp-chrome-devtools/scripts
+cd ./.claude/skills/mcp-chrome-devtools/scripts
+
+# Install dependencies
+npm install
 
 # Navigate to page
 node navigate.js --url https://example.com
@@ -431,7 +461,10 @@ node get_console_logs.js
 # Generate filesystem skill
 mcp2scripts generate filesystem
 
-cd ~/.claude/skills/mcp-filesystem/scripts
+cd ./.claude/skills/mcp-filesystem/scripts
+
+# Install dependencies
+npm install
 
 # List directory
 node list_directory.js --path /tmp
@@ -450,12 +483,12 @@ node write_file.js --path /tmp/output.txt --content "Hello World"
 mcp2scripts generate --all
 
 # Use browser to fetch data
-cd ~/.claude/skills/mcp-chrome-devtools/scripts
+cd ./.claude/skills/mcp-chrome-devtools/scripts
 node navigate.js --url https://api.example.com/data.json
 node screenshot.js --full-page > data.png
 
 # Save to file
-cd ~/.claude/skills/mcp-filesystem/scripts
+cd ./.claude/skills/mcp-filesystem/scripts
 node write_file.js --path /tmp/data.png --content-from-stdin < ~/data.png
 ```
 

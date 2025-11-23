@@ -198,6 +198,36 @@ describe('Integration Tests', () => {
       const expectedPath = path.join(homedir(), '.claude/skills/mcp-test-server');
       expect(mockedFs.mkdir).toHaveBeenCalledWith(expectedPath, { recursive: true });
     });
+
+    it('should use project folder as default output directory', async () => {
+      const mockServer: ServerInfo = {
+        name: 'test-server',
+        status: 'connected',
+        toolCount: 1,
+      };
+
+      const mockTools: Tool[] = [
+        {
+          name: 'test-tool',
+          description: 'Test tool',
+          inputSchema: { type: 'object' },
+        },
+      ];
+
+      mockedAxios.get
+        .mockResolvedValueOnce({ data: [mockServer] })
+        .mockResolvedValueOnce({ data: mockTools });
+
+      const gen = new ScriptGenerator();
+      // Not passing outputDir - should use default ./.claude/skills
+      await gen.generateSkill('test-server');
+
+      // Default should be ./.claude/skills (project folder)
+      // Note: path.join normalizes './.claude/skills' to '.claude/skills'
+      expect(mockedFs.mkdir).toHaveBeenCalledWith('.claude/skills/mcp-test-server', {
+        recursive: true,
+      });
+    });
   });
 
   describe('generateAllSkills', () => {

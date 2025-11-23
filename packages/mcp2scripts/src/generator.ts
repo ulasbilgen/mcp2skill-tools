@@ -105,13 +105,13 @@ export class ScriptGenerator {
    *     │   └── ...
    *
    * @param serverName - Name of the MCP server in mcp2rest
-   * @param outputDir - Directory to create skill in (default: ~/.claude/skills)
+   * @param outputDir - Directory to create skill in (default: ./.claude/skills)
    * @returns Result object with skill path and metadata
    * @throws {Error} If server not found, has no tools, or cannot write files
    */
   async generateSkill(
     serverName: string,
-    outputDir: string = '~/.claude/skills'
+    outputDir: string = './.claude/skills'
   ): Promise<GenerateSkillResult> {
     // Expand user path
     const expandedPath = outputDir.startsWith('~')
@@ -177,10 +177,10 @@ export class ScriptGenerator {
   /**
    * Generate skills for all servers in mcp2rest.
    *
-   * @param outputDir - Directory to create skills in (default: ~/.claude/skills)
+   * @param outputDir - Directory to create skills in (default: ./.claude/skills)
    * @returns List of result objects for generated skills
    */
-  async generateAllSkills(outputDir: string = '~/.claude/skills'): Promise<GenerateSkillResult[]> {
+  async generateAllSkills(outputDir: string = './.claude/skills'): Promise<GenerateSkillResult[]> {
     const servers = await this.listServers();
     const generated: GenerateSkillResult[] = [];
 

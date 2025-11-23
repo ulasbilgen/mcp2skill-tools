@@ -5,6 +5,32 @@ All notable changes to mcp2scripts will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-22
+
+### Breaking Changes
+
+- **Changed default skill output directory from `~/.claude/skills` (user folder) to `./.claude/skills` (project folder)**
+  - Skills are now generated in the current working directory by default
+  - This allows project-specific skill configurations
+  - Use the new `-u` or `--user` flag to generate in user folder (`~/.claude/skills`)
+  - Existing workflows using the default path need to either:
+    - Use `-u/--user` flag to maintain old behavior: `mcp2scripts generate chrome-devtools --user`
+    - Or use `-o ~/.claude/skills` to explicitly specify user folder
+
+### Added
+
+- New `-u, --user` flag for `generate` command
+  - Generates skills in `~/.claude/skills` (user folder)
+  - Mutually exclusive with `-o, --output` flag
+  - Example: `mcp2scripts generate chrome-devtools --user`
+
+### Changed
+
+- Default output directory changed from `~/.claude/skills` to `./.claude/skills`
+- CLI help text updated to reflect new default with examples
+- Documentation updated throughout (README.md, examples, API reference)
+- Console "Next steps" message updated to mention both project and user skill locations
+
 ## [0.1.1] - 2025-11-22
 
 ### Added
@@ -128,5 +154,6 @@ mcp2scripts is a complete TypeScript rewrite of the Python package `mcp2skill`:
    - Replace `mcp2skill` with `mcp2scripts`
    - Update Python script calls to JavaScript
 
+[0.2.0]: https://github.com/ulasbilgen/mcp2skill-tools/releases/tag/mcp2scripts-v0.2.0
 [0.1.1]: https://github.com/ulasbilgen/mcp2skill-tools/releases/tag/mcp2scripts-v0.1.1
 [0.1.0]: https://github.com/ulasbilgen/mcp2skill-tools/releases/tag/mcp2scripts-v0.1.0

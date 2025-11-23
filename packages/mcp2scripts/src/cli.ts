@@ -78,7 +78,7 @@ async function serversCommand(options: { endpoint: string }): Promise<void> {
  */
 async function generateCommand(
   serverName: string | undefined,
-  options: { all: boolean; output: string; endpoint: string }
+  options: { all: boolean; output: string; user: boolean; endpoint: string }
 ): Promise<void> {
   if (!serverName && !options.all) {
     console.error('Error: Must specify SERVER_NAME or use --all flag');
@@ -91,6 +91,15 @@ async function generateCommand(
     process.exit(1);
   }
 
+  // Check for mutually exclusive flags
+  if (options.user && options.output !== './.claude/skills') {
+    console.error('Error: Cannot use --user and --output together');
+    process.exit(1);
+  }
+
+  // Determine output directory
+  const outputDir = options.user ? '~/.claude/skills' : options.output;
+
   try {
     const gen = new ScriptGenerator(options.endpoint);
 
@@ -98,9 +107,9 @@ async function generateCommand(
       // Generate for all servers
       console.log('Generating skills for all servers...');
       console.log(`mcp2rest: ${options.endpoint}`);
-      console.log(`Output: ${options.output}\n`);
+      console.log(`Output: ${outputDir}\n`);
 
-      const results = await gen.generateAllSkills(options.output);
+      const results = await gen.generateAllSkills(outputDir);
 
       if (results.length === 0) {
         console.error('No connected servers with tools found.');
@@ -115,9 +124,9 @@ async function generateCommand(
       // Generate for specific server
       console.log(`Generating skill for '${serverName}'...`);
       console.log(`mcp2rest: ${options.endpoint}`);
-      console.log(`Output: ${options.output}\n`);
+      console.log(`Output: ${outputDir}\n`);
 
-      const result = await gen.generateSkill(serverName, options.output);
+      const result = await gen.generateSkill(serverName, outputDir);
 
       console.log(`${chalk.green('✓')} Generated skill: ${result.skillPath}`);
       console.log(`  SKILL.md: ${result.skillPath}/SKILL.md`);
@@ -125,9 +134,9 @@ async function generateCommand(
     }
 
     console.log(`\n${chalk.bold('Next steps:')}`);
-    console.log('  1. Claude Code will auto-discover skills in ~/.claude/skills/');
-    console.log('  2. Or manually navigate to skill directory');
-    console.log('  3. Run scripts: node scripts/tool_name.js --help');
+    console.log('  1. Navigate to skill directory and run: npm install');
+    console.log('  2. Run scripts: node scripts/tool_name.js --help');
+    console.log('  3. Claude Code will auto-discover skills from project .claude/skills/ or user ~/.claude/skills/');
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     const errorName = error instanceof Error ? error.constructor.name : 'Error';
@@ -223,12 +232,14 @@ program
   .command('generate [server-name]')
   .description('Generate Claude Code skill(s) from MCP server(s)')
   .option('--all', 'Generate skills for all connected servers')
-  .option('-o, --output <dir>', 'Output directory for generated skills', '~/.claude/skills')
+  .option('-o, --output <dir>', 'Output directory for generated skills', './.claude/skills')
+  .option('-u, --user', 'Generate in user folder (~/.claude/skills) instead of project folder')
   .option('--endpoint <url>', 'mcp2rest service URL', 'http://localhost:28888')
   .addHelpText(
     'after',
     '\nExamples:\n' +
-      '  $ mcp2scripts generate chrome-devtools\n' +
+      '  $ mcp2scripts generate chrome-devtools           # generates in ./.claude/skills\n' +
+      '  $ mcp2scripts generate chrome-devtools --user    # generates in ~/.claude/skills\n' +
       '  $ mcp2scripts generate --all\n' +
       '  $ mcp2scripts generate chrome-devtools -o ./my-skills\n' +
       '  $ mcp2scripts generate chrome-devtools --endpoint http://192.168.1.100:28888'
