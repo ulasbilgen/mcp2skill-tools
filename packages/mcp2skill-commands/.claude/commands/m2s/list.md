@@ -1,13 +1,13 @@
 ---
 description: List available MCP servers from mcp2rest
-allowed-tools: Bash(mcp2skill:*), Bash(ls:*)
+allowed-tools: Bash(mcp2scripts:*), Bash(ls:*), Glob
 ---
 
 Display all MCP servers available in mcp2rest and identify which need skills generated.
 
 ## Step 1: Get server list
 
-Use Bash to retrieve servers from mcp2rest: `mcp2skill servers`
+Use Bash to retrieve servers from mcp2rest: `mcp2scripts servers`
 
 Parse and display the results in a clear format showing:
 - Server name
@@ -17,12 +17,16 @@ Parse and display the results in a clear format showing:
 
 ## Step 2: Check for existing skills
 
-Use Glob to check which servers already have skills generated: `~/.claude/skills/mcp-*/`
+Use Glob to check which servers already have skills generated in both locations:
+- Project skills: `./.claude/skills/mcp-*/`
+- User skills: `~/.claude/skills/mcp-*/`
 
 ## Step 3: Compare and suggest
 
 For each connected server with tools:
-- **If skill exists:** "✓ mcp-{server-name} (skill exists)"
+- **If skill exists in project:** "✓ mcp-{server-name} (skill exists in ./.claude/skills/)"
+- **If skill exists in user:** "✓ mcp-{server-name} (skill exists in ~/.claude/skills/)"
+- **If skill exists in both:** "✓ mcp-{server-name} (skill exists in BOTH locations)"
 - **If skill missing:** "✗ {server-name} (no skill) - Use `/m2s-generate {server-name}`"
 
 ## Step 4: Provide recommendations
@@ -54,12 +58,17 @@ Available MCP Servers (3 total):
 ✓ chrome-devtools
   Status: connected
   Tools: 26
-  Skill: EXISTS at ~/.claude/skills/mcp-chrome-devtools/
+  Skill: EXISTS at ./.claude/skills/mcp-chrome-devtools/ (project)
 
-✗ filesystem
+✓ filesystem
   Status: connected
   Tools: 8
-  Skill: MISSING - Run `/m2s-generate filesystem`
+  Skill: EXISTS at ~/.claude/skills/mcp-filesystem/ (user)
+
+✗ database-tools
+  Status: connected
+  Tools: 12
+  Skill: MISSING - Run `/m2s-generate database-tools`
 
 ! weather-api
   Status: disconnected

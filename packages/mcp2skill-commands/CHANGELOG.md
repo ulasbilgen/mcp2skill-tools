@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-23
+
+### Breaking Changes
+
+- **Updated for mcp2scripts (JavaScript) instead of mcp2skill (Python)**
+  - All commands now generate JavaScript scripts instead of Python scripts
+  - Skills use `mcp_client.js` instead of `mcp_client.py`
+  - Tool scripts use commander.js instead of argparse
+  - Skills include `package.json` with dependencies (axios, commander)
+  - npm install required after skill generation
+
+- **Default skill location changed to project folder**
+  - Skills now generated in `./.claude/skills/` (project) by default
+  - Use `--user` flag to generate in `~/.claude/skills/` (user) folder
+  - This aligns with mcp2scripts v0.2.0 default behavior
+
+### Changed
+
+- Updated `/m2s:init` to check for and install mcp2scripts instead of mcp2skill
+- Updated `/m2s:generate` to:
+  - Generate JavaScript scripts with commander.js
+  - Run `npm install` in scripts directory after generation
+  - Default to project folder with option for user folder
+  - Show package.json in skill structure
+- Updated `/m2s:update` to:
+  - Regenerate JavaScript scripts
+  - Run `npm install` after script regeneration
+  - Check both project and user folders for existing skills
+- Updated `/m2s:list` to check both `./.claude/skills/` and `~/.claude/skills/`
+- Updated all documentation (README.md, skill-authoring-guide.md) for JavaScript
+- Updated all examples to show `node scripts/tool.js` instead of `python scripts/tool.py`
+
+### Dependencies
+
+- Now requires [mcp2rest](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest) v0.4.0+
+- Now requires [mcp2scripts](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2scripts) v0.2.0+
+- Node.js 18+ required (for generated skills)
+
+### Migration Guide
+
+If upgrading from v0.1.0:
+
+1. Uninstall Python package: `pip uninstall mcp2skill`
+2. Install JavaScript package: `npm install -g mcp2scripts`
+3. Regenerate existing skills: `/m2s:generate <server-name>`
+4. Update any custom scripts to use JavaScript syntax
+5. Run `npm install` in each skill's scripts directory
+
 ## [0.1.0] - 2025-01-22
 
 ### Added

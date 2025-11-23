@@ -2,7 +2,7 @@
 
 Generate JavaScript scripts from MCP Server Tools for Claude Code Skills.
 
-`mcp2scripts` queries your local [mcp2rest](https://github.com/yourusername/mcp2rest) service and generates executable JavaScript scripts for each MCP tool, packaged as [Claude Code skills](https://docs.anthropic.com/claude/docs/claude-code).
+`mcp2scripts` queries your local [mcp2rest](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest) service and generates executable JavaScript scripts for each MCP tool, packaged as [Claude Code skills](https://docs.anthropic.com/claude/docs/claude-code).
 
 ## Features
 
@@ -496,7 +496,7 @@ node write_file.js --path /tmp/data.png --content-from-stdin < ~/data.png
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/mcp2skill-tools.git
+git clone https://github.com/ulasbilgen/mcp2skill-tools.git
 cd mcp2skill-tools/packages/mcp2scripts
 
 # Install dependencies

@@ -1,9 +1,9 @@
 ---
-description: Setup mcp2rest and mcp2skill for first-time use
-allowed-tools: Bash(which:*), Bash(npm:*), Bash(pip:*), Bash(mcp2rest:*), Bash(mcp2skill:*), Bash(curl:*)
+description: Setup mcp2rest and mcp2scripts for first-time use
+allowed-tools: Bash(which:*), Bash(npm:*), Bash(mcp2rest:*), Bash(mcp2scripts:*), Bash(curl:*)
 ---
 
-Guide the user through initial setup of mcp2skill and mcp2rest.
+Guide the user through initial setup of mcp2scripts and mcp2rest.
 
 ## Step 1: Check mcp2rest installation
 
@@ -17,14 +17,14 @@ Check if mcp2rest is installed: !`which mcp2rest`
 **If installed:**
 - Show version: !`mcp2rest --version`
 
-## Step 2: Check mcp2skill installation
+## Step 2: Check mcp2scripts installation
 
-Check if mcp2skill is installed: !`pip show mcp2skill`
+Check if mcp2scripts is installed: !`npm list -g mcp2scripts`
 
 **If not installed:**
-- Explain: "mcp2skill generates Claude Code skills from mcp2rest servers"
-- Install: `pip install mcp2skill`
-- Verify: !`pip show mcp2skill`
+- Explain: "mcp2scripts generates Claude Code skills (JavaScript scripts) from mcp2rest servers"
+- Install: `npm install -g mcp2scripts`
+- Verify: !`npm list -g mcp2scripts`
 
 **If installed:**
 - Show version from output
@@ -46,7 +46,7 @@ Check if mcp2rest is already running: !`curl -s http://localhost:28888/health 2>
 
 ## Step 4: Check for existing servers
 
-List current servers: !`mcp2skill servers`
+List current servers: !`mcp2scripts servers`
 
 **If no servers:**
 - Ask user: "Would you like to add your first MCP server now?"
@@ -59,21 +59,23 @@ List current servers: !`mcp2skill servers`
 **If servers exist:**
 - Show the list
 - Ask: "Would you like to generate skills for any of these? Use `/m2s-generate <server-name>`"
+- **Important**: After generating skills, you'll need to run `npm install` in the generated scripts directory to install dependencies (axios, commander) before running the scripts.
 
 ## Step 5: Summary
 
 Provide a summary:
 - ✓ mcp2rest: [installed/not installed]
 - ✓ mcp2rest service: [running/not running]
-- ✓ mcp2skill: [installed/not installed]
+- ✓ mcp2scripts: [installed/not installed]
 - ✓ Servers loaded: [count]
 
 **Next steps:**
 1. Add servers: `/m2s-add <server-name> <package>`
 2. List servers: `/m2s-list`
 3. Generate skills: `/m2s-generate <server-name>`
+4. Install dependencies: `cd ./.claude/skills/mcp-<server-name>/scripts && npm install`
 
 **Resources:**
-- mcp2rest: https://github.com/ulasbilgen/mcp2rest
-- mcp2skill: https://github.com/ulasbilgen/mcp2skill
+- mcp2rest: https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest
+- mcp2scripts: https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2scripts
 - MCP servers: https://github.com/modelcontextprotocol/servers

@@ -10,7 +10,7 @@ This project provides 5 slash commands that guide you through the complete workf
 
 These are Claude Code slash commands that provide an **interactive, LLM-enhanced** workflow for creating skills from MCP servers:
 
-- `/m2s:init` - First-time setup wizard (installs mcp2rest + mcp2skill)
+- `/m2s:init` - First-time setup wizard (installs mcp2rest + mcp2scripts)
 - `/m2s:add` - Add new MCP server to mcp2rest
 - `/m2s:list` - List servers and skill generation status
 - `/m2s:generate` - **Interactive skill generation with Claude**
@@ -30,15 +30,15 @@ You need these two packages installed:
 npm install -g mcp2rest
 ```
 
-[mcp2rest](https://github.com/ulasbilgen/mcp2rest) is a REST API gateway for MCP servers.
+[mcp2rest](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest) is a REST API gateway for MCP servers.
 
-### 2. mcp2skill (Python package)
+### 2. mcp2scripts (JavaScript/TypeScript package)
 
 ```bash
-pip install mcp2skill
+npm install -g mcp2scripts
 ```
 
-[mcp2skill](https://github.com/ulasbilgen/mcp2skill) generates Claude Code skills from mcp2rest servers.
+[mcp2scripts](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2scripts) generates Claude Code skills (JavaScript scripts) from mcp2rest servers.
 
 ---
 
@@ -60,13 +60,14 @@ pip install mcp2skill
 
 ```bash
 # Clone this repo
-git clone https://github.com/ulasbilgen/mcp2skill-commands.git
+git clone https://github.com/ulasbilgen/mcp2skill-tools.git
+cd mcp2skill-tools/packages/mcp2skill-commands
 
 # Create symlink for commands
-ln -s $(pwd)/mcp2skill-commands/.claude/commands/m2s ~/.claude/commands/m2s
+ln -s $(pwd)/.claude/commands/m2s ~/.claude/commands/m2s
 
 # Copy skill authoring guide
-cp mcp2skill-commands/docs/skill-authoring-guide.md ~/.claude/
+cp docs/skill-authoring-guide.md ~/.claude/
 ```
 
 ### Verification
@@ -84,7 +85,7 @@ In Claude Code, type `/m2s` and you should see all 5 commands auto-complete.
 ```
 
 Claude will:
-- Check if mcp2rest and mcp2skill are installed
+- Check if mcp2rest and mcp2scripts are installed
 - Guide you through installation if needed
 - Start the mcp2rest service
 - Verify it's running on http://localhost:28888
@@ -119,11 +120,13 @@ Claude will:
 
 Claude will:
 1. **Analyze the server** - Read tool descriptions and detect domain
-2. **Ask where to generate** - User-level (`~/.claude/skills/`) or project-level (`./.claude/skills/`)
+2. **Ask where to generate** - Project-level (`./.claude/skills/` - default) or user-level (`~/.claude/skills/`)
 3. **Suggest tool groupings** - For servers with >10 tools
-4. **Generate enhanced SKILL.md** - Following best practices from the skill authoring guide
-5. **Create reference files** - Progressive disclosure for complex skills
-6. **Iterate with feedback** - Refine before finalizing
+4. **Generate JavaScript scripts** - Creates Node.js scripts with commander.js CLI
+5. **Install dependencies** - Runs `npm install` for axios and commander
+6. **Generate enhanced SKILL.md** - Following best practices from the skill authoring guide
+7. **Create reference files** - Progressive disclosure for complex skills
+8. **Iterate with feedback** - Refine before finalizing
 
 ### Step 5: Update Skills
 
@@ -214,7 +217,7 @@ Shows which servers are connected, how many tools each has, and which ones need 
 **What happens:**
 - Detects added/removed tools since last generation
 - Offers update options:
-  1. Scripts only - Just regenerate Python tool scripts
+  1. Scripts only - Just regenerate JavaScript tool scripts and reinstall dependencies
   2. Docs only - Improve SKILL.md with latest best practices
   3. Full regeneration - Complete rebuild
 - Creates backup before updating
@@ -248,9 +251,9 @@ This guide is automatically consulted during `/m2s:generate` and `/m2s:update` t
 ~/.claude/skills/mcp-{server-name}/
 ├── SKILL.md              # Main documentation (~150-300 lines)
 └── scripts/
-    ├── mcp_client.py     # Shared REST client
-    ├── tool1.py          # Tool scripts with argparse
-    ├── tool2.py
+    ├── mcp_client.js     # Shared REST client
+    ├── tool1.js          # Tool scripts with commander.js
+    ├── tool2.js
     └── ...
 ```
 
@@ -260,7 +263,7 @@ This guide is automatically consulted during `/m2s:generate` and `/m2s:update` t
 ~/.claude/skills/mcp-{server-name}/
 ├── SKILL.md              # Overview + quick start (~300-500 lines)
 ├── scripts/              # All tool scripts
-│   ├── mcp_client.py
+│   ├── mcp_client.js
 │   └── ...
 ├── workflows/            # Common workflow examples
 │   ├── automation.md
@@ -283,7 +286,7 @@ This guide is automatically consulted during `/m2s:generate` and `/m2s:update` t
                 ▼
 ┌─────────────────────────────────────────┐
 │ 2. Claude analyzes MCP server           │
-│    Queries: mcp2skill tools <server>    │
+│    Queries: mcp2scripts tools <server>    │
 │    Detects domain, complexity           │
 └───────────────┬─────────────────────────┘
                 │
@@ -296,9 +299,9 @@ This guide is automatically consulted during `/m2s:generate` and `/m2s:update` t
                 │
                 ▼
 ┌─────────────────────────────────────────┐
-│ 4. Generates Python scripts             │
-│    Runs: mcp2skill generate <server>    │
-│    Creates argparse wrappers            │
+│ 4. Generates JavaScript scripts             │
+│    Runs: mcp2scripts generate <server>    │
+│    Creates JavaScript scripts with commander.js CLI            │
 └───────────────┬─────────────────────────┘
                 │
                 ▼
@@ -316,7 +319,7 @@ This guide is automatically consulted during `/m2s:generate` and `/m2s:update` t
 ```
 You: /m2s:init
 
-Claude: Let me help you set up mcp2skill...
+Claude: Let me help you set up mcp2scripts...
         Checking mcp2rest... not installed
         → Installing: npm install -g mcp2rest
         ✓ Installed
@@ -396,8 +399,8 @@ mcp2rest start
 
 ## Related Projects
 
-- **[mcp2rest](https://github.com/ulasbilgen/mcp2rest)** - REST API gateway for MCP servers (required)
-- **[mcp2skill](https://github.com/ulasbilgen/mcp2skill)** - Skill generator from mcp2rest (required)
+- **[mcp2rest](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2rest)** - REST API gateway for MCP servers (required)
+- **[mcp2scripts](https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2scripts)** - Skill generator from mcp2rest (required)
 - **[MCP](https://modelcontextprotocol.io)** - Model Context Protocol specification
 
 ---
@@ -416,5 +419,5 @@ Ulas Bilgenoglu
 
 Issues and pull requests welcome!
 
-- GitHub: https://github.com/ulasbilgen/mcp2skill-commands
-- Issues: https://github.com/ulasbilgen/mcp2skill-commands/issues
+- GitHub: https://github.com/ulasbilgen/mcp2skill-tools/tree/main/packages/mcp2skill-commands
+- Issues: https://github.com/ulasbilgen/mcp2skill-tools/issues

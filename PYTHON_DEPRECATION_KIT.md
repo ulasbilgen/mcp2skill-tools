@@ -128,7 +128,7 @@ setup(
     long_description_content_type='text/markdown',
     author='Your Name',
     author_email='your.email@example.com',
-    url='https://github.com/yourusername/mcp2skill',
+    url='https://github.com/ulasbilgen/mcp2skill',
     packages=find_packages(),
     classifiers=[
         'Development Status :: 7 - Inactive',  # Mark as inactive
@@ -155,7 +155,7 @@ setup(
     project_urls={
         'Deprecated In Favor Of': 'https://www.npmjs.com/package/mcp2scripts',
         'Migration Guide': 'https://github.com/ulasbilgen/mcp2skill-tools/blob/main/packages/mcp2scripts/MIGRATION_FROM_PYTHON.md',
-        'Bug Tracker': 'https://github.com/yourusername/mcp2skill/issues',
+        'Bug Tracker': 'https://github.com/ulasbilgen/mcp2skill/issues',
     },
 )
 ```
@@ -191,8 +191,8 @@ dependencies = [
 [project.urls]
 "Deprecated In Favor Of" = "https://www.npmjs.com/package/mcp2scripts"
 "Migration Guide" = "https://github.com/ulasbilgen/mcp2skill-tools/blob/main/packages/mcp2scripts/MIGRATION_FROM_PYTHON.md"
-"Homepage" = "https://github.com/yourusername/mcp2skill"
-"Bug Tracker" = "https://github.com/yourusername/mcp2skill/issues"
+"Homepage" = "https://github.com/ulasbilgen/mcp2skill"
+"Bug Tracker" = "https://github.com/ulasbilgen/mcp2skill/issues"
 
 [project.scripts]
 mcp2skill = "mcp2skill.cli:main"
