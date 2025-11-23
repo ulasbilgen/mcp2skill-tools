@@ -57,7 +57,7 @@ Present options:
 
 2. **Improve SKILL.md only** - Keep scripts, enhance documentation
    - Use when: Tools unchanged but docs need improvement
-   - Apply latest best practices from ./docs/skill-authoring-guide.md
+   - Apply latest best practices from ./.claude/commands/m2s/docs/skill-authoring-guide.md
 
 3. **Full regeneration** - Recreate entire skill
    - Use when: Major tool changes or significant doc improvements needed
@@ -81,7 +81,7 @@ Present options:
 ### Option 2: Improve SKILL.md only
 
 1. Use Read tool for current SKILL.md: `$SKILL_PATH/mcp-$1/SKILL.md`
-2. Analyze against ./docs/skill-authoring-guide.md best practices:
+2. Analyze against ./.claude/commands/m2s/docs/skill-authoring-guide.md best practices:
    - Check line count (should be <500)
    - Verify concrete examples exist
    - Check for checklists in workflows

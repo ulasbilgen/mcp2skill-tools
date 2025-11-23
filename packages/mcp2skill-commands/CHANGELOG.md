@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-11-23
+
+### Fixed
+
+- **Fixed skill-authoring-guide.md path references in slash commands**
+  - Updated all references from relative paths (`./docs/skill-authoring-guide.md`) to Claude Code-resolvable paths (`./.claude/commands/m2s/docs/skill-authoring-guide.md`)
+  - Ensures the guide can be found regardless of which directory Claude Code is running from
+  - Affects `/m2s:generate` (4 references) and `/m2s:update` (2 references)
+- **Fixed mcp2rest default port in CLAUDE.md**
+  - Updated documentation to reflect correct default port 28888 instead of 3000
+
 ## [0.2.0] - 2025-11-23
 
 ### Breaking Changes
