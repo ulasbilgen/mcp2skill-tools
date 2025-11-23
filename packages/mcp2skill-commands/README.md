@@ -44,35 +44,57 @@ npm install -g mcp2scripts
 
 ## Installation
 
-### Option 1: Manual Installation
+### Option 1: Project-Level Commands (Recommended)
 
-1. **Copy the commands directory:**
-   ```bash
-   cp -r .claude/commands/m2s ~/.claude/commands/
-   ```
+**Copy the m2s folder to your project:**
+```bash
+# From within your project directory
+cp -r /path/to/mcp2skill-tools/packages/mcp2skill-commands/.claude/commands/m2s ./.claude/commands/
+```
 
-2. **Copy the skill authoring guide:**
-   ```bash
-   cp docs/skill-authoring-guide.md ~/.claude/
-   ```
+**Benefits:**
+- Commands available only in this project
+- Project-specific customizations possible
+- No global namespace pollution
 
-### Option 2: Clone and Symlink
+### Option 2: User-Level Commands (Global)
+
+**Copy the m2s folder to your user directory:**
+```bash
+cp -r .claude/commands/m2s ~/.claude/commands/
+```
+
+**Benefits:**
+- Commands available in all projects
+- One-time setup
+
+**Note:** If both project and user-level commands exist, project-level takes precedence.
+
+### Option 3: Development (Symlink)
 
 ```bash
 # Clone this repo
 git clone https://github.com/ulasbilgen/mcp2skill-tools.git
 cd mcp2skill-tools/packages/mcp2skill-commands
 
-# Create symlink for commands
-ln -s $(pwd)/.claude/commands/m2s ~/.claude/commands/m2s
-
-# Copy skill authoring guide
-cp docs/skill-authoring-guide.md ~/.claude/
+# Symlink for development (choose project or user level)
+ln -s $(pwd)/.claude/commands/m2s ./.claude/commands/m2s    # Project-level
+# OR
+ln -s $(pwd)/.claude/commands/m2s ~/.claude/commands/m2s   # User-level
 ```
 
 ### Verification
 
 In Claude Code, type `/m2s` and you should see all 5 commands auto-complete.
+
+You can verify the installation:
+```bash
+# Check project-level
+ls ./.claude/commands/m2s/
+# OR check user-level
+ls ~/.claude/commands/m2s/
+# Should show: add.md, docs/, generate.md, init.md, list.md, update.md
+```
 
 ---
 
@@ -231,7 +253,7 @@ Shows which servers are connected, how many tools each has, and which ones need 
 
 ## Skill Authoring Guide
 
-The commands reference `docs/skill-authoring-guide.md`, which contains all best practices for writing high-quality Claude Code skills:
+The commands reference `./docs/skill-authoring-guide.md` (bundled in the m2s folder), which contains all best practices for writing high-quality Claude Code skills:
 
 - Quality standards
 - Progressive disclosure patterns
@@ -367,21 +389,29 @@ Claude: Generating skill with:
 
 ### "Command not found"
 
-Make sure you copied the commands:
+Make sure you copied the commands. Check both locations (project-level takes precedence):
 ```bash
+# Check project-level (recommended)
+ls ./.claude/commands/m2s/
+
+# Check user-level
 ls ~/.claude/commands/m2s/
 ```
 
-Should show: `add.md`, `generate.md`, `init.md`, `list.md`, `update.md`
+Should show: `add.md`, `docs/`, `generate.md`, `init.md`, `list.md`, `update.md`
 
 ### "skill-authoring-guide.md not found"
 
-The `/m2s:generate` and `/m2s:update` commands reference `@docs/skill-authoring-guide.md`. Make sure it exists:
+The `/m2s:generate` and `/m2s:update` commands reference `./docs/skill-authoring-guide.md`. Check both locations:
 ```bash
-ls ~/. claude/docs/skill-authoring-guide.md
+# Check project-level
+ls ./.claude/commands/m2s/docs/skill-authoring-guide.md
+
+# Check user-level
+ls ~/.claude/commands/m2s/docs/skill-authoring-guide.md
 ```
 
-Or update the `@` references in the command files.
+The docs folder is bundled inside the m2s folder, so copying m2s should include everything.
 
 ### "Cannot connect to mcp2rest"
 
