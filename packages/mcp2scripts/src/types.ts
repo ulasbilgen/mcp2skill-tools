@@ -38,6 +38,12 @@ export interface ServerInfo {
   transport?: 'stdio' | 'http';
   package?: string;
   url?: string;
+  serverVersion?: {
+    name: string;
+    title?: string;
+    version: string;
+    websiteUrl?: string;
+  };
   [key: string]: unknown;
 }
 

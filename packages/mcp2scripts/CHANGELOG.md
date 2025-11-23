@@ -5,6 +5,39 @@ All notable changes to mcp2scripts will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-11-23
+
+### Added
+
+- **Server version headers in all generated scripts** - Every generated JavaScript file now includes server version information
+  - Tool scripts (`scripts/*.js`) include header with: server name, version, generation date, and tool name
+  - Shared MCP client (`mcp_client.js`) includes header with server name and version
+  - SKILL.md frontmatter now includes `server-version` field
+  - Example header format:
+    ```javascript
+    /**
+     * MCP Server: chrome-devtools
+     * Server Version: 0.10.2
+     * Generated: 2025-11-23
+     * Tool: navigate
+     */
+    ```
+- **Version tracking metadata file** - New `.skill-metadata.json` file created in each skill
+  - Contains: serverName, serverVersion, serverVersionInfo, generatedAt, mcp2scriptsVersion, mcp2restUrl
+  - Enables skill update commands to detect server version changes
+  - Used by `/m2s:update` slash command to warn about version mismatches
+
+### Changed
+
+- Updated `ServerInfo` type to include optional `serverVersion` field
+- Generator now fetches and uses server version from mcp2rest API
+- All template functions updated to accept and use version parameters
+
+### Requirements
+
+- Requires mcp2rest v0.5.0+ for server version information support
+- Generated skills now include version metadata for better tracking and debugging
+
 ## [0.2.1] - 2025-11-23
 
 ### Fixed

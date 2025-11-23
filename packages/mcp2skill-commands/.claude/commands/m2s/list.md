@@ -11,6 +11,7 @@ Use Bash to retrieve servers from mcp2rest: `mcp2scripts servers`
 
 Parse and display the results in a clear format showing:
 - Server name
+- **Server version** (if available)
 - Status (connected/disconnected)
 - Tool count
 - Transport type (stdio/http)
@@ -55,17 +56,17 @@ Offer specific commands the user can run:
 ```
 Available MCP Servers (3 total):
 
-✓ chrome-devtools
+✓ chrome-devtools (v0.10.2)
   Status: connected
   Tools: 26
   Skill: EXISTS at ./.claude/skills/mcp-chrome-devtools/ (project)
 
-✓ filesystem
+✓ filesystem (v1.2.0)
   Status: connected
   Tools: 8
   Skill: EXISTS at ~/.claude/skills/mcp-filesystem/ (user)
 
-✗ database-tools
+✗ database-tools (v2.1.0)
   Status: connected
   Tools: 12
   Skill: MISSING - Run `/m2s-generate database-tools`
@@ -75,3 +76,5 @@ Available MCP Servers (3 total):
   Tools: 0
   Note: Server may need restart
 ```
+
+**Note:** Display version in format `(vX.Y.Z)` after server name if serverVersion.version is available from mcp2scripts servers output. If version is null or not provided, omit the version display.

@@ -22,7 +22,7 @@
  * ```
  */
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.3.0';
 
 // Export core generator
 export { ScriptGenerator } from './generator.js';

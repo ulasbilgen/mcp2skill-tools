@@ -135,6 +135,25 @@ export class ScriptGenerator {
     const skillDir = path.join(expandedPath, `mcp-${serverName}`);
     await fs.mkdir(skillDir, { recursive: true });
 
+    // Extract server version
+    const serverVersion = serverInfo.serverVersion?.version || 'unknown';
+    const generationDate = new Date().toISOString();
+
+    // Create .skill-metadata.json for version tracking
+    const metadata = {
+      serverName,
+      serverVersion,
+      serverVersionInfo: serverInfo.serverVersion,
+      generatedAt: generationDate,
+      mcp2scriptsVersion: '0.3.0',
+      mcp2restUrl: this.baseUrl
+    };
+    await fs.writeFile(
+      path.join(skillDir, '.skill-metadata.json'),
+      JSON.stringify(metadata, null, 2),
+      'utf-8'
+    );
+
     // Generate SKILL.md
     const skillMd = createSkillMd(serverName, serverInfo, tools, this.baseUrl);
     await fs.writeFile(path.join(skillDir, 'SKILL.md'), skillMd, 'utf-8');
@@ -148,13 +167,13 @@ export class ScriptGenerator {
     await fs.writeFile(path.join(scriptsDir, 'package.json'), packageJson, 'utf-8');
 
     // Generate shared mcp_client.js utility
-    const mcpClientCode = createMcpClientScript(this.baseUrl);
+    const mcpClientCode = createMcpClientScript(this.baseUrl, serverName, serverVersion, generationDate);
     await fs.writeFile(path.join(scriptsDir, 'mcp_client.js'), mcpClientCode, 'utf-8');
 
     // Generate JavaScript script for each tool
     const scriptsCreated: string[] = [];
     for (const tool of tools) {
-      const scriptCode = createToolScript(serverName, tool);
+      const scriptCode = createToolScript(serverName, tool, serverVersion, generationDate);
       const scriptFile = path.join(scriptsDir, `${tool.name}.js`);
       await fs.writeFile(scriptFile, scriptCode, 'utf-8');
       // Make executable (Unix-like systems only)

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-11-23
+
+### Added
+
+- **Version-aware slash commands** - All m2s commands now display and track server version information
+  - `/m2s:list` now shows server version alongside server name and tool count
+  - `/m2s:generate` displays server version during skill generation workflow
+  - `/m2s:update` detects server version changes and warns users
+    - Reads `.skill-metadata.json` to compare current vs previous version
+    - Recommends "Full regeneration" when version has changed
+    - Helps prevent compatibility issues from server updates
+
+### Changed
+
+- Commands now leverage mcp2rest v0.5.0's server version tracking
+- Update workflow enhanced with version change detection
+- All commands reference skill-authoring-guide.md with proper Claude Code paths
+
+### Requirements
+
+- Requires mcp2rest v0.5.0+ for server version information
+- Requires mcp2scripts v0.3.0+ for version metadata file generation
+
 ## [0.2.1] - 2025-11-23
 
 ### Fixed

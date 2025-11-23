@@ -10,13 +10,20 @@ Generate a Claude Code skill for MCP server "$1" with LLM-enhanced documentation
 
 ## Step 1: Analyze the MCP server
 
-Use Bash to get tool information: `mcp2scripts tools $1`
+Use Bash to get server info and tools: `mcp2scripts servers` and `mcp2scripts tools $1`
 
 Parse the output to extract:
+- **Server version** (from servers output - display if available)
 - Total tool count
 - Tool names and descriptions
 - Required vs optional parameters
 - Identify patterns in tool names (click, fill, page, navigate, etc.)
+
+**Display server version prominently:** If the server provides version info, show it like:
+```
+Generating skill for chrome-devtools (v0.10.2)
+Found 26 tools...
+```
 
 ## Step 2: Detect domain and complexity
 

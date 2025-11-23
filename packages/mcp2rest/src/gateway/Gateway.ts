@@ -154,6 +154,17 @@ export class Gateway {
         // Connect client to transport
         await client.connect(transport);
 
+        // Capture server metadata after connection
+        const serverVersion = client.getServerVersion();
+        if (serverVersion) {
+          serverState.serverVersion = {
+            name: serverVersion.name,
+            title: serverVersion.title,
+            version: serverVersion.version,
+            websiteUrl: serverVersion.websiteUrl
+          };
+        }
+
         // List available tools
         const toolsResponse = await client.listTools();
         tools = toolsResponse.tools.map((tool: any) => ({
@@ -383,7 +394,8 @@ export class Gateway {
         toolCount: state.tools.length,
         error: state.lastError,
         lastConnected: state.lastConnected?.toISOString(),
-        validationWarning: state.validationWarning
+        validationWarning: state.validationWarning,
+        serverVersion: state.serverVersion
       };
 
       // Add transport-specific fields

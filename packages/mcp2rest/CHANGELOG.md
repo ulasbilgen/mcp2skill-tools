@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-11-23
+
+### Added
+
+- **Server version tracking** - Automatically captures and exposes MCP server version information
+  - Added `serverVersion` field to `ServerState` interface with name, title, version, and websiteUrl
+  - Gateway now calls `client.getServerVersion()` after connection to capture server metadata
+  - API `/servers` endpoint now includes `serverVersion` object for each server
+  - Version information displayed includes server name, version number, optional title and website URL
+- New `serverVersion` field in `ServerInfo` type for API responses
+
+### Technical Details
+
+- Server version captured immediately after MCP client connection via SDK's `getServerVersion()` method
+- Version information persists in server state throughout connection lifecycle
+- Gracefully handles servers that don't provide version information (shows `null`)
+- Tested with chrome-devtools (v0.10.2) and figma-desktop (v1.0.0) MCP servers
+
 ## [0.4.3] - 2025-11-23
 
 ### Changed

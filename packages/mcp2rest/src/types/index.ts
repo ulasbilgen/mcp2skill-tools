@@ -26,6 +26,12 @@ export interface ServerState {
   lastError?: string;
   lastConnected?: Date;
   validationWarning?: string; // Warning message if server has schema validation issues
+  serverVersion?: {
+    name: string;
+    title?: string;
+    version: string;
+    websiteUrl?: string;
+  };
 }
 
 /**
@@ -63,6 +69,12 @@ export interface ServerInfo {
   error?: string;
   lastConnected?: string;
   validationWarning?: string; // Warning if server has schema validation issues
+  serverVersion?: {
+    name: string;
+    title?: string;
+    version: string;
+    websiteUrl?: string;
+  };
 }
 
 /**

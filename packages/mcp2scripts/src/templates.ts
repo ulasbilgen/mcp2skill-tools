@@ -37,10 +37,12 @@ export function createSkillMd(
 
   const description = generateDescription(serverName, serverInfo, toolCount);
   const intro = generateIntro(serverName, serverInfo);
+  const serverVersion = serverInfo.serverVersion?.version || 'unknown';
 
   return `---
 name: mcp-${serverName}
 description: ${description}
+server-version: ${serverVersion}
 ---
 
 # ${serverName.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} MCP Server
@@ -291,11 +293,24 @@ export function createPackageJson(serverName: string): string {
  * This script is used by all generated tool scripts to call mcp2rest.
  *
  * @param mcp2restUrl - Base URL of mcp2rest service
+ * @param serverName - Name of the MCP server
+ * @param serverVersion - Version of the MCP server
+ * @param generationDate - Date of generation (ISO format)
  * @returns JavaScript code for mcp_client.js
  */
-export function createMcpClientScript(mcp2restUrl: string): string {
+export function createMcpClientScript(
+  mcp2restUrl: string,
+  serverName: string,
+  serverVersion: string,
+  generationDate: string
+): string {
+  const genDate = generationDate.split('T')[0]; // Extract YYYY-MM-DD
   return `#!/usr/bin/env node
 /**
+ * MCP REST Client for ${serverName}
+ * Server Version: ${serverVersion}
+ * Generated: ${genDate}
+ *
  * Shared MCP REST client for tool scripts.
  */
 
@@ -380,12 +395,20 @@ export async function callTool(server, tool, args) {
  *
  * @param serverName - Name of the MCP server
  * @param tool - Tool schema
+ * @param serverVersion - Version of the MCP server
+ * @param generationDate - Date of generation (ISO format)
  * @returns JavaScript code for the tool script
  */
-export function createToolScript(serverName: string, tool: Tool): string {
+export function createToolScript(
+  serverName: string,
+  tool: Tool,
+  serverVersion: string,
+  generationDate: string
+): string {
   const toolName = tool.name;
   const description = tool.description || `Execute ${toolName} tool`;
   const schema = tool.inputSchema || {};
+  const genDate = generationDate.split('T')[0]; // Extract YYYY-MM-DD
 
   // Generate commander options code
   const commanderOptions = generateCommanderFromSchema(schema);
@@ -398,6 +421,11 @@ export function createToolScript(serverName: string, tool: Tool): string {
 
   return `#!/usr/bin/env node
 /**
+ * MCP Server: ${serverName}
+ * Server Version: ${serverVersion}
+ * Generated: ${genDate}
+ * Tool: ${toolName}
+ *
  * ${description}
  */
 
