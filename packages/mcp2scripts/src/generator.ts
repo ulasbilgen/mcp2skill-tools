@@ -9,6 +9,7 @@ import { homedir } from 'os';
 import type { ServerInfo, Tool, GenerateSkillResult } from './types.js';
 import { MCPConnectionError } from './exceptions.js';
 import { createSkillMd, createMcpClientScript, createToolScript, createPackageJson } from './templates.js';
+import { VERSION } from './version.js';
 
 export class ScriptGenerator {
   private baseUrl: string;
@@ -145,7 +146,7 @@ export class ScriptGenerator {
       serverVersion,
       serverVersionInfo: serverInfo.serverVersion,
       generatedAt: generationDate,
-      mcp2scriptsVersion: '0.3.0',
+      mcp2scriptsVersion: VERSION,
       mcp2restUrl: this.baseUrl
     };
     await fs.writeFile(

@@ -5,6 +5,18 @@ All notable changes to mcp2scripts will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-11-23
+
+### Fixed
+
+- **Version synchronization** - VERSION constant now imports from package.json instead of being hardcoded
+  - Created `src/version.ts` utility that imports version from package.json
+  - Updated `src/index.ts` to re-export VERSION from version utility
+  - Updated `src/generator.ts` to import VERSION instead of hardcoding it
+  - Updated tsconfig.json to use `module: "nodenext"` for import attributes support
+  - Ensures CLI `--version` and `.skill-metadata.json` always match package.json
+  - Eliminates manual version updates in multiple files
+
 ## [0.3.0] - 2025-11-23
 
 ### Added

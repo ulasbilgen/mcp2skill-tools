@@ -22,7 +22,8 @@
  * ```
  */
 
-export const VERSION = '0.3.0';
+// Export version (imported from package.json)
+export { VERSION } from './version.js';
 
 // Export core generator
 export { ScriptGenerator } from './generator.js';
