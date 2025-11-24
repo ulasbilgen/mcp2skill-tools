@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] - 2025-11-24
+
+### Added
+
+- **Documentation**: Added comprehensive authentication examples to README
+  - HTTP servers with headers (Ref, Context7 examples)
+  - Stdio servers with environment variables (simple and complex patterns)
+  - PostHog complex example demonstrating environment variable substitution with mcp-remote
+  - Table of tested MCP servers showing various authentication patterns
+- **Documentation**: Moved API Key & Authentication Support from "Future Enhancements" to "Recently Completed"
+- Demonstrated 43 PostHog analytics tools available via authenticated connection
+
+### Technical Details
+
+- PostHog example showcases complex stdio setup with:
+  - mcp-remote package for HTTP SSE → MCP protocol bridging
+  - Environment variable (`POSTHOG_AUTH_HEADER`) with Bearer token
+  - Header passthrough using `${VAR}` substitution in `--header` argument
+  - Multiple `-a` flags for complex argument arrays including flags
+- Updated tested servers table with 5 different servers, 79 total tools
+- All examples use placeholder API keys for security
+
 ## [0.6.0] - 2025-11-24
 
 ### Added

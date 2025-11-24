@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: mcp2rest API
-  version: 0.6.0
+  version: 0.6.1
   description: |
     REST API for managing and interacting with MCP (Model Context Protocol) servers.
 

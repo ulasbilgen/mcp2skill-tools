@@ -232,6 +232,64 @@ mcp2rest add chrome chrome-devtools-mcp@latest
 mcp2rest add fs @modelcontextprotocol/server-filesystem --args /home/user/workspace
 ```
 
+## Authentication
+
+mcp2rest v0.6.0+ supports authentication for MCP servers that require API keys or credentials.
+
+### HTTP Servers with Headers
+
+For HTTP-based MCP servers that require authentication headers:
+
+```bash
+# Ref server with custom API key header
+mcp2rest add ref https://api.ref.tools/mcp \
+  -H "x-ref-api-key=your-api-key-here"
+
+# Context7 with API key header
+mcp2rest add context7 https://mcp.context7.com/mcp \
+  -H "CONTEXT7_API_KEY=ctx7sk-your-key-here"
+
+# Multiple headers
+mcp2rest add api https://api.example.com/mcp \
+  -H "X-API-Key=key" \
+  -H "Authorization=Bearer token"
+```
+
+### Stdio Servers with Environment Variables
+
+For stdio-based servers that need environment variables:
+
+```bash
+# Simple environment variable
+mcp2rest add myserver my-mcp-package@latest \
+  -e API_KEY=your-key-here \
+  -e DATABASE_URL=postgres://...
+
+# Complex example: PostHog with mcp-remote
+# The server uses environment variable substitution in its --header argument
+mcp2rest add posthog mcp-remote@latest \
+  -a https://mcp.posthog.com/sse \
+  -a --header \
+  -a 'Authorization:${POSTHOG_AUTH_HEADER}' \
+  -e POSTHOG_AUTH_HEADER='Bearer phx_YOUR_PERSONAL_API_KEY_HERE'
+```
+
+**Note:** For stdio servers with multiple arguments including flags (like `--header`), use multiple `-a` flags to pass each argument separately.
+
+### Tested MCP Servers
+
+Here are examples of successfully tested MCP servers with various authentication patterns:
+
+| Server | Transport | Auth Method | Tools | Description |
+|--------|-----------|-------------|-------|-------------|
+| Context7 | stdio | CLI args (`--api-key`) | 2 | Library documentation search |
+| Ref | HTTP | Header (`x-ref-api-key`) | 2 | Web & GitHub documentation search |
+| PostHog | stdio | Env vars + header passthrough | 43 | Analytics & dashboards |
+| figma-desktop | HTTP | None (local) | 6 | Figma design system access |
+| chrome-devtools | stdio | None | 26 | Browser automation |
+
+All servers support both CLI configuration and REST API configuration.
+
 ## Configuration
 
 Configuration is stored in `~/.mcp2rest/config.yaml`:
@@ -393,6 +451,15 @@ Common error codes:
 
 ## Recently Completed ✅
 
+- [x] **API Key & Authentication Support** (v0.6.0)
+  - HTTP headers for HTTP-based MCP servers (`-H` flag)
+  - Environment variables for stdio-based MCP servers (`-e` flag)
+  - Generic header support (any header name)
+  - URL query parameter authentication (automatic)
+  - Tested with Context7, Ref, PostHog, and more
+  - Security: API responses show `hasHeaders`/`hasEnv` flags without exposing values
+  - See [Authentication](#authentication) section for examples
+
 - [x] **Custom Port & Host Configuration** (v0.2.8)
   - CLI flags: `--port` and `--host` for start command
   - Environment variables: `MCP2REST_PORT` and `MCP2REST_HOST`
@@ -418,10 +485,6 @@ Common error codes:
 
 ### Future Enhancements
 
-- **API Key & Authentication Support** - See [API_KEY_SUPPORT.md](./API_KEY_SUPPORT.md) for detailed implementation plan
-  - HTTP headers for HTTP-based MCP servers
-  - Environment variables for stdio-based MCP servers
-  - Support for services like Context7, PostHog, Figma Cloud, etc.
 - Rate limiting
 - WebSocket support for streaming
 - Web-based dashboard
