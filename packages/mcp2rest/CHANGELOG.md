@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-11-24
+
+### Added
+
+- **API Key and Authentication Support** - Generic authentication support for both HTTP and stdio transports
+  - Added `headers` field to `ServerConfig` for HTTP transport authentication (supports any header name)
+  - Added `env` field to `ServerConfig` for stdio transport environment variables
+  - CLI options: `-H, --header <key=value>` for HTTP headers (repeatable)
+  - CLI options: `-e, --env <key=value>` for environment variables (repeatable)
+  - API endpoint support: `POST /servers` now accepts `headers` and `env` fields
+  - Security: API responses include `hasHeaders`/`hasEnv` flags without exposing values
+  - Compatible with various authentication patterns:
+    - Custom header names (e.g., `x-ref-api-key`, `CONTEXT7_API_KEY`, `Authorization`)
+    - Multiple headers per server
+    - Environment variables for stdio servers
+  - Fully backward compatible - servers without authentication continue to work
+
+### Examples
+
+**HTTP with custom headers:**
+```bash
+mcp2rest add ref https://api.ref.tools/mcp -H "x-ref-api-key=ref-xxx"
+mcp2rest add context7 https://mcp.context7.com/mcp -H "CONTEXT7_API_KEY=ctx7sk-xxx"
+```
+
+**Stdio with environment variables:**
+```bash
+mcp2rest add myserver pkg@latest -e API_KEY=sk-xxx -e DATABASE_URL=postgres://...
+```
+
+### Technical Details
+
+- HTTP headers passed via `StreamableHTTPClientTransport` `requestInit.headers` option
+- Stdio environment variables passed via `StdioClientTransport` `env` parameter
+- Uses MCP SDK v1.18.2 native authentication support (no SDK upgrade required)
+- Header parsing handles values containing `=` characters (e.g., base64 encoded keys)
+- Added security considerations for plaintext secret storage in config files
+
 ## [0.5.0] - 2025-11-23
 
 ### Added

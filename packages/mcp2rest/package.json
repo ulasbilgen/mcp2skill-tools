@@ -1,6 +1,6 @@
 {
   "name": "mcp2rest",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A standalone Node.js daemon that manages multiple MCP servers and exposes their tools via REST API",
   "main": "dist/index.js",
   "bin": {

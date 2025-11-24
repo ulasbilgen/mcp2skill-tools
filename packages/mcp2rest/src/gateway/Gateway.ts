@@ -119,7 +119,8 @@ export class Gateway {
         const args = [serverConfig.package!, ...(serverConfig.args || [])];
         transport = new StdioClientTransport({
           command: 'npx',
-          args: args
+          args: args,
+          env: serverConfig.env  // Pass environment variables for authentication
         });
       } else {
         // HTTP: Connect to external server via SSE
@@ -135,7 +136,14 @@ export class Gateway {
           throw new Error(`${ErrorCode.INVALID_URL}: Invalid URL format: ${error.message}`);
         }
 
-        transport = new StreamableHTTPClientTransport(serverUrl);
+        // Build options with headers if provided
+        const transportOptions = serverConfig.headers ? {
+          requestInit: {
+            headers: serverConfig.headers
+          }
+        } : undefined;
+
+        transport = new StreamableHTTPClientTransport(serverUrl, transportOptions);
       }
 
       // Create MCP client (same for both transports)
@@ -401,8 +409,16 @@ export class Gateway {
       // Add transport-specific fields
       if (transportType === 'stdio') {
         info.package = state.config.package;
+        // Security: Only indicate if env vars are configured, don't expose values
+        if (state.config.env && Object.keys(state.config.env).length > 0) {
+          info.hasEnv = true;
+        }
       } else {
         info.url = state.config.url;
+        // Security: Only indicate if headers are configured, don't expose values
+        if (state.config.headers && Object.keys(state.config.headers).length > 0) {
+          info.hasHeaders = true;
+        }
       }
 
       serverInfoList.push(info);
@@ -434,6 +450,8 @@ export class Gateway {
       args?: string[];
       url?: string;
       transport?: 'stdio' | 'http';
+      headers?: Record<string, string>;
+      env?: Record<string, string>;
     }
   ): Promise<void> {
     // Check if server already exists

@@ -8,8 +8,10 @@ export interface ServerConfig {
   // For stdio transport
   package?: string;
   args?: string[];
+  env?: Record<string, string>;  // Environment variables for stdio transport
   // For HTTP transport
   url?: string;
+  headers?: Record<string, string>;  // HTTP headers for authentication
   // Optional explicit transport type
   transport?: 'stdio' | 'http';
 }
@@ -69,6 +71,8 @@ export interface ServerInfo {
   error?: string;
   lastConnected?: string;
   validationWarning?: string; // Warning if server has schema validation issues
+  hasHeaders?: boolean;  // Indicates if HTTP headers are configured (security: don't expose values)
+  hasEnv?: boolean;      // Indicates if environment variables are configured (security: don't expose values)
   serverVersion?: {
     name: string;
     title?: string;

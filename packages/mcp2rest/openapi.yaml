@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: mcp2rest API
-  version: 0.4.2
+  version: 0.6.0
   description: |
     REST API for managing and interacting with MCP (Model Context Protocol) servers.
 
@@ -12,6 +12,7 @@ info:
     ## Features
     - Execute tools on MCP servers via REST API
     - Manage multiple servers simultaneously (stdio and HTTP transports)
+    - Authentication support (HTTP headers and stdio environment variables)
     - Dynamic server addition and removal
     - Query available tools and server status
   contact:
@@ -233,6 +234,21 @@ paths:
                   name: my-server
                   url: http://example.com/mcp
                   transport: http
+              httpWithHeaders:
+                summary: HTTP server with authentication headers
+                value:
+                  name: ref
+                  url: https://api.ref.tools/mcp
+                  headers:
+                    x-ref-api-key: "your-api-key-here"
+              stdioWithEnv:
+                summary: Stdio server with environment variables
+                value:
+                  name: authenticated-server
+                  package: "my-mcp-server@latest"
+                  env:
+                    API_KEY: "your-api-key"
+                    DATABASE_URL: "postgres://user:pass@localhost/db"
       responses:
         '201':
           description: Server added successfully
@@ -572,6 +588,22 @@ components:
             - stdio
             - http
           description: Transport type (auto-detected if not specified)
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: HTTP headers for authentication (HTTP transport only)
+          example:
+            x-api-key: "your-api-key"
+            Authorization: "Bearer your-token"
+        env:
+          type: object
+          additionalProperties:
+            type: string
+          description: Environment variables for authentication (stdio transport only)
+          example:
+            API_KEY: "your-api-key"
+            DATABASE_URL: "postgres://..."
 
     ServerInfo:
       type: object
@@ -620,6 +652,12 @@ components:
           format: date-time
           description: ISO 8601 timestamp of last successful connection (optional)
           example: "2025-11-08T23:13:21.738Z"
+        hasHeaders:
+          type: boolean
+          description: Indicates if HTTP headers are configured (security - values not exposed)
+        hasEnv:
+          type: boolean
+          description: Indicates if environment variables are configured (security - values not exposed)
 
     Tool:
       type: object

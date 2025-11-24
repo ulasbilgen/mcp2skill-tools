@@ -144,7 +144,7 @@ export class APIServer {
    */
   private async handleAddServer(req: Request, res: Response): Promise<void> {
     try {
-      const { name, package: pkg, args, url, transport } = req.body;
+      const { name, package: pkg, args, url, transport, headers, env } = req.body;
 
       // Validate request body
       if (!name) {
@@ -184,7 +184,9 @@ export class APIServer {
         package: pkg,
         args,
         url,
-        transport
+        transport,
+        headers,
+        env
       });
 
       // Return success response

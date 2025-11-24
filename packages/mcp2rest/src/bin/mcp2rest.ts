@@ -534,6 +534,8 @@ program
   .description('Add a new MCP server to the gateway')
   .option('-t, --transport <type>', 'Transport type: stdio or http (auto-detected if not specified)')
   .option('-a, --args <args...>', 'Additional arguments for the server (stdio only)')
+  .option('-H, --header <key=value...>', 'HTTP headers for authentication (http only, repeatable)')
+  .option('-e, --env <key=value...>', 'Environment variables for authentication (stdio only, repeatable)')
   .action(async (name: string, packageOrUrl: string, options) => {
     try {
       // Determine if this is a URL or package based on transport option or pattern
@@ -559,10 +561,40 @@ program
 
       if (transport === 'http') {
         requestBody.url = packageOrUrl;
+
+        // Parse headers if provided (for HTTP transport)
+        if (options.header) {
+          requestBody.headers = {};
+          for (const header of options.header) {
+            const separatorIndex = header.indexOf('=');
+            if (separatorIndex === -1) {
+              console.error(`✗ Invalid header format: ${header}. Expected format: key=value`);
+              process.exit(1);
+            }
+            const key = header.substring(0, separatorIndex);
+            const value = header.substring(separatorIndex + 1); // Handle values with '=' in them
+            requestBody.headers[key] = value;
+          }
+        }
       } else {
         requestBody.package = packageOrUrl;
         if (options.args) {
           requestBody.args = options.args;
+        }
+
+        // Parse env vars if provided (for stdio transport)
+        if (options.env) {
+          requestBody.env = {};
+          for (const envVar of options.env) {
+            const separatorIndex = envVar.indexOf('=');
+            if (separatorIndex === -1) {
+              console.error(`✗ Invalid env var format: ${envVar}. Expected format: key=value`);
+              process.exit(1);
+            }
+            const key = envVar.substring(0, separatorIndex);
+            const value = envVar.substring(separatorIndex + 1); // Handle values with '=' in them
+            requestBody.env[key] = value;
+          }
         }
       }
 
